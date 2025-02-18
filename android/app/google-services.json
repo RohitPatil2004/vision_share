@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "230760623326",
+    "project_id": "vision-share-64644",
+    "storage_bucket": "vision-share-64644.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230760623326:android:7866cba1c8c44d531f664f",
+        "android_client_info": {
+          "package_name": "com.example.vision_share"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGlvI1x3CtNSerBX_jX1__TwlhopfG6IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230760623326:android:6341ace22091ceb61f664f",
+        "android_client_info": {
+          "package_name": "com.visionshare.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGlvI1x3CtNSerBX_jX1__TwlhopfG6IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
