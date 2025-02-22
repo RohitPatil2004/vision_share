@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
         // Naviage to home screen.
         print("Login Successful");
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );

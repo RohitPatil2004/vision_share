@@ -6,6 +6,9 @@ import 'dart:io' show Platform;
 import 'options_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  final TextEditingController _idController = TextEditingController();
+  int _selectedIndex = 0;
+
   Future<String?> _fetchUniqueId() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -19,6 +22,10 @@ class HomeScreen extends StatelessWidget {
       }
     }
     return null;
+  }
+
+  void _connect() {
+    print('Connecting...');
   }
 
   @override
@@ -49,15 +56,88 @@ class HomeScreen extends StatelessWidget {
                     child: Text('No unique ID Found.'),
                   );
                 } else {
+                  String uniqueId = snapshot.data!;
+                  String part1 =
+                      uniqueId.length > 4 ? uniqueId.substring(0, 4) : uniqueId;
+                  String part2 =
+                      uniqueId.length > 8
+                          ? uniqueId.substring(4, 8)
+                          : uniqueId.substring(4);
+                  String part3 =
+                      uniqueId.length > 12
+                          ? uniqueId.substring(8, 12)
+                          : uniqueId.substring(8);
+
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      snapshot.data!,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          part1,
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 24,
+                          ),
+                        ),
+                        SizedBox(width: 8), // Space between parts
+                        Text(
+                          part2,
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 24,
+                          ),
+                        ),
+                        SizedBox(width: 8), // Space between parts
+                        Text(
+                          part3,
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 24,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }
               },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _idController,
+                keyboardType: TextInputType.number,
+                maxLength: 12,
+                decoration: InputDecoration(
+                  hintText: 'Enter ID of the system you want to connect.',
+                  hintStyle: TextStyle(color: Colors.white54),
+                  filled: true,
+                  fillColor: Colors.black,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _connect,
+              child: Text(
+                'Connect →',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                backgroundColor: Colors.amberAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
             ),
           ],
         ),
@@ -69,7 +149,6 @@ class HomeScreen extends StatelessWidget {
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
                     label: 'Home',
-                    backgroundColor: Colors.amberAccent[100],
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.settings),
@@ -80,15 +159,18 @@ class HomeScreen extends StatelessWidget {
                     label: 'Features',
                   ),
                 ],
+                currentIndex: _selectedIndex,
+                selectedItemColor: Colors.blue,
+                unselectedItemColor: Colors.grey,
                 onTap: (index) {
                   if (index == 0) {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
                   }
                   if (index == 1) {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => OptionsScreen()),
                     );
@@ -111,7 +193,7 @@ class HomeScreen extends StatelessWidget {
                       title: Text('Home'),
                       tileColor: Colors.amberAccent[100],
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => HomeScreen()),
                         );
@@ -121,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                       leading: Icon(Icons.settings),
                       title: Text('Options'),
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => OptionsScreen(),

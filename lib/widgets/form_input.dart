@@ -30,7 +30,7 @@ class FormInput extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
         ),
-        hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
+        hintStyle: TextStyle(color: textColor),
       ),
       style: TextStyle(color: textColor),
       validator: validator,

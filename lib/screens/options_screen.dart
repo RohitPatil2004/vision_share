@@ -6,7 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 
 class OptionsScreen extends StatelessWidget {
-  Future<void> logoutUser (BuildContext context) async {
+  int _selectedIndex = 1;
+
+  Future<void> logoutUser(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
       Navigator.pushReplacement(
@@ -25,85 +27,89 @@ class OptionsScreen extends StatelessWidget {
       body: Center(
         child: CustomButton(
           text: "LOGOUT →",
-          onPressed: () => logoutUser (context),
+          onPressed: () => logoutUser(context),
         ),
       ),
-      bottomNavigationBar: Platform.isAndroid || Platform.isIOS
-          ? BottomNavigationBar(
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: 'Options',
-                  backgroundColor: Colors.amberAccent[100],
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.featured_play_list),
-                  label: 'Features',
-                ),
-              ],
-              onTap: (index) {
-                if (index == 0) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                }
-                if (index == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => OptionsScreen()),
-                  );
-                }
-              },
-            )
-          : null,
-      drawer: Platform.isMacOS || Platform.isWindows || Platform.isLinux
-          ? Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  DrawerHeader(
-                    child: Text('Menu'),
-                    decoration: BoxDecoration(color: Colors.blue),
+      bottomNavigationBar:
+          Platform.isAndroid || Platform.isIOS
+              ? BottomNavigationBar(
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
                   ),
-                  ListTile(
-                    leading: Icon(Icons.home),
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
-                    },
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings),
+                    label: 'Options',
                   ),
-                  ListTile(
-                    leading: Icon(Icons.settings),
-                    title: Text('Options'),
-                    tileColor: Colors.amberAccent[100],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OptionsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.featured_play_list),
-                    title: Text('Features'),
-                    onTap: () {
-                      // Handle navigation to Features
-                    },
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.featured_play_list),
+                    label: 'Features',
                   ),
                 ],
-              ),
-            )
-          : null,
+                currentIndex: _selectedIndex,
+                selectedItemColor: Colors.blue,
+                unselectedItemColor: Colors.grey,
+                onTap: (index) {
+                  if (index == 0) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+                  }
+                  if (index == 1) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => OptionsScreen()),
+                    );
+                  }
+                },
+              )
+              : null,
+      drawer:
+          Platform.isMacOS || Platform.isWindows || Platform.isLinux
+              ? Drawer(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    DrawerHeader(
+                      child: Text('Menu'),
+                      decoration: BoxDecoration(color: Colors.blue),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.home),
+                      title: Text('Home'),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.settings),
+                      title: Text('Options'),
+                      tileColor: Colors.amberAccent[100],
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OptionsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.featured_play_list),
+                      title: Text('Features'),
+                      onTap: () {
+                        // Handle navigation to Features
+                      },
+                    ),
+                  ],
+                ),
+              )
+              : null,
     );
   }
 }
