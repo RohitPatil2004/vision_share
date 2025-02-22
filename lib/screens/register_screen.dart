@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../widgets/form_input.dart';
 import '../widgets/custom_button.dart';
 import 'login_screen.dart';
@@ -14,35 +16,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  String _generateUniqueId() {
+    final random = DateTime.now().millisecondsSinceEpoch.toString();
+    return random.substring(random.length - 12);
+  }
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Passwords do not match")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Passwords do not match")));
         return;
       }
 
-      try {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+      setState(() {
+        _isLoading = true;
+      });
 
-        // Naviage to the loginscreen after successful registraion.
-        Navigator.pushReplacement(
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            );
+
+        String uniqueId = _generateUniqueId();
+        await FirebaseFirestore.instance.collection('IDS').doc(userCredential.user!.uid).set({
+          'email': _emailController.text.trim(),
+          'uniqueId': uniqueId,
+        });
+
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
+          (route) => false,
         );
-        
-        // Handle successful registration (e.g., navigate to home screen)
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? "Registration failed")),
-        );
+        String errorMessage;
+        if (e.code == 'email-already-in-use') {
+          errorMessage = "This email is already in use.";
+        } else if (e.code == 'weak-password') {
+          errorMessage = "The password is too weak.";
+        } else if (e.code == 'invalid-email') {
+          errorMessage = "The email address is invalid.";
+        } else {
+          errorMessage = e.message ?? "Registration failed.";
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Email is required.";
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return "Enter a valid email.";
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Password is required.";
+    }
+    if (value.length < 6) {
+      return "Password must be at least 6 characters.";
+    }
+    return null;
   }
 
   @override
@@ -68,6 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: false,
                 backgroundColor: const Color.fromARGB(255, 31, 28, 28),
                 textColor: Colors.white,
+                validator: _validateEmail,
               ),
               SizedBox(height: 16),
               FormInput(
@@ -76,6 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: true,
                 backgroundColor: const Color.fromARGB(255, 31, 28, 28),
                 textColor: Colors.white,
+                validator: _validatePassword,
               ),
               SizedBox(height: 16),
               FormInput(
@@ -84,12 +138,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: true,
                 backgroundColor: const Color.fromARGB(255, 31, 28, 28),
                 textColor: Colors.white,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Confirm your password.";
+                  }
+                  if (value != _passwordController.text) {
+                    return "Passwords do not match.";
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
-              CustomButton(
-                text: "Register",
-                onPressed: _register,
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  },
+                  child: Text(
+                    "Go to Login Page →",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ),
+              SizedBox(height: 20),
+              _isLoading
+                  ? CircularProgressIndicator()
+                  : CustomButton(text: "Register", onPressed: _register),
             ],
           ),
         ),

@@ -1,14 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io' show Platform;
 
 import 'options_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  Future<String?> _fetchUniqueId() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection('IDS')
+              .doc(user.uid)
+              .get();
+      if (snapshot.exists) {
+        return snapshot['uniqueId'];
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Home Screen')),
-      body: Center(child: Text('Welcome to the Home Screen!')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FutureBuilder<String?>(
+              future: _fetchUniqueId(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else if (!snapshot.hasData || snapshot.data == null) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('No unique ID Found.'),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      snapshot.data!,
+                      style: TextStyle(color: Colors.redAccent, fontSize: 24),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar:
           Platform.isAndroid || Platform.isIOS
               ? BottomNavigationBar(
@@ -28,8 +81,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
                 onTap: (index) {
-                  // Handle navigation based on the selected index
-                  // You can use Navigator.push or any other navigation method
                   if (index == 0) {
                     Navigator.push(
                       context,
@@ -44,7 +95,7 @@ class HomeScreen extends StatelessWidget {
                   }
                 },
               )
-              : null, // No bottom navigation for desktop
+              : null,
       drawer:
           Platform.isMacOS || Platform.isWindows || Platform.isLinux
               ? Drawer(
@@ -81,14 +132,12 @@ class HomeScreen extends StatelessWidget {
                     ListTile(
                       leading: Icon(Icons.featured_play_list),
                       title: Text('Features'),
-                      onTap: () {
-                        // Handle navigation to Features
-                      },
+                      onTap: () {},
                     ),
                   ],
                 ),
               )
-              : null, // No drawer for mobile
+              : null,
     );
   }
 }

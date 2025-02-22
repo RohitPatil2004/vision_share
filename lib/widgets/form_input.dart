@@ -6,15 +6,16 @@ class FormInput extends StatelessWidget {
   final bool obscureText;
   final Color backgroundColor;
   final Color textColor;
+  final String? Function(String?)? validator;
 
-  const FormInput({
-    Key? key,
+  FormInput({
     required this.controller,
     required this.hintText,
     required this.obscureText,
     required this.backgroundColor,
     required this.textColor,
-  }) : super(key: key);
+    this.validator,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +33,7 @@ class FormInput extends StatelessWidget {
         hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
       ),
       style: TextStyle(color: textColor),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter $hintText';
-        }
-        return null;
-      },
+      validator: validator,
     );
   }
 }

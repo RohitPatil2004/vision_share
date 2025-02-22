@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+
+import 'home_screen.dart';
+import 'register_screen.dart';
 import '../widgets/form_input.dart';
 import '../widgets/custom_button.dart';
-
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,17 +20,22 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+        UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            );
         // Naviage to home screen.
         print("Login Successful");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
         // Handle successful login (e.g., navigate to home screen)
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? "Login failed")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message ?? "Login failed")));
       }
     }
   }
@@ -53,7 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _emailController,
                 hintText: "Email",
                 obscureText: false,
-                backgroundColor: const Color.fromARGB(255, 31, 28, 28), // Black background for input
+                backgroundColor: const Color.fromARGB(
+                  255,
+                  31,
+                  28,
+                  28,
+                ), // Black background for input
                 textColor: Colors.white, // White text color
               ),
               SizedBox(height: 16),
@@ -61,13 +74,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 hintText: "Password",
                 obscureText: true,
-                backgroundColor: const Color.fromARGB(255, 31, 28, 28), // Black background for input
+                backgroundColor: const Color.fromARGB(
+                  255,
+                  31,
+                  28,
+                  28,
+                ), // Black background for input
                 textColor: Colors.white, // White text color
               ),
               SizedBox(height: 20),
-              CustomButton(
-                text: "Login",
-                onPressed: _login,
+              CustomButton(text: "Login", onPressed: _login),
+              SizedBox(height: 20),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
+                  },
+                  child: Text(
+                    "Go to Register Page →",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
