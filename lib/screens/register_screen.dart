@@ -18,11 +18,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
+  // Regular expression for password validation
+  String passwordPattern =
+      r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$';
+
+  String emailPattern =
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+  // Function to generate unique ID
   String _generateUniqueId() {
     final random = DateTime.now().millisecondsSinceEpoch.toString();
     return random.substring(random.length - 12);
   }
 
+  // Register logic
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text != _confirmPasswordController.text) {
@@ -47,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         await FirebaseFirestore.instance.collection('IDS').doc(userCredential.user!.uid).set({
           'email': _emailController.text.trim(),
           'uniqueId': uniqueId,
+          'isActive': "false",
         });
 
         Navigator.pushAndRemoveUntil(
@@ -76,23 +86,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Email validation
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return "Email is required.";
     }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) {
+    RegExp emailRegExp = RegExp(emailPattern);
+    if (!emailRegExp.hasMatch(value)) {
       return "Enter a valid email.";
     }
     return null;
   }
 
+  // Password validation
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return "Password is required.";
     }
-    if (value.length < 6) {
-      return "Password must be at least 6 characters.";
+    RegExp passwordRegExp = RegExp(passwordPattern);
+    if (!passwordRegExp.hasMatch(value)) {
+      return 'Password must contain: \n- At least 1 uppercase letter \n- At least 1 number \n- At least 1 special symbol \n- Minimum 6 characters';
     }
     return null;
   }

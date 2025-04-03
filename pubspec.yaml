@@ -38,6 +38,8 @@ dependencies:
   firebase_core: ^3.11.0
   firebase_admin: ^0.3.0+1
   cloud_firestore: ^5.6.4
+  flutter_webrtc: ^0.13.0
+  web_socket_channel: ^3.0.2
 
 dev_dependencies:
   flutter_test:
